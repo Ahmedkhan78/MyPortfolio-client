@@ -48,7 +48,11 @@ const Projects = () => {
         Projects
       </Heading>
 
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
+      <SimpleGrid
+        columns={{ base: 1, md: 2, lg: 3 }}
+        spacing={10}
+        position={"relative"}
+      >
         {projects.map((project, index) => (
           <MotionBox
             key={project.id}

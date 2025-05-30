@@ -1,10 +1,8 @@
-// src/components/Navbar.jsx
 import {
   Box,
   Flex,
   HStack,
   IconButton,
-  Button,
   useDisclosure,
   Stack,
   useColorMode,
@@ -12,11 +10,14 @@ import {
   Link,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { Link as RouterLink } from "react-router-dom"; // 👈 Import Router Link
 
 const Links = ["Home", "Projects", "About", "Contact"];
 
 const NavLink = ({ children }) => (
   <Link
+    as={RouterLink}
+    to={children === "Home" ? "/" : `/${children.toLowerCase()}`} // 👈 Smart routing
     px={2}
     py={1}
     rounded={"md"}
@@ -24,7 +25,6 @@ const NavLink = ({ children }) => (
       textDecoration: "none",
       bg: useColorModeValue("gray.200", "gray.700"),
     }}
-    href={"#" + children.toLowerCase()}
   >
     {children}
   </Link>
@@ -35,7 +35,13 @@ export default function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <Box bg={useColorModeValue("gray.100", "gray.900")} px={4} shadow="md">
+    <Box
+      bg={useColorModeValue("gray.100", "gray.900")}
+      px={4}
+      shadow="md"
+      zIndex="999"
+      position="relative"
+    >
       <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
         <Box fontWeight="bold" fontSize="xl">
           Ahmed.Dev

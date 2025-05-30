@@ -9,12 +9,19 @@ import {
   Textarea,
   VStack,
   Heading,
-  useColorModeValue,
 } from "@chakra-ui/react";
 
 const Contact = () => {
   return (
-    <Box id="contact" maxW="600px" mx="auto" py={16} px={4}>
+    <Box
+      id="contact"
+      maxW="600px"
+      mx="auto"
+      py={16}
+      px={4}
+      position="relative"
+      zIndex={1}
+    >
       <Heading as="h2" mb={8} textAlign="center">
         Contact Me
       </Heading>
