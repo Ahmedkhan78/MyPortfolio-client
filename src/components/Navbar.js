@@ -17,7 +17,7 @@ const Links = ["Home", "Projects", "About", "Contact"];
 const NavLink = ({ children }) => (
   <Link
     as={RouterLink}
-    to={children === "Home" ? "/" : `/${children.toLowerCase()}`} // 👈 Smart routing
+    to={children === "Home" ? "/" : `/${children.toLowerCase()}`} //  Smart routing
     px={2}
     py={1}
     rounded={"md"}
@@ -44,7 +44,9 @@ export default function Navbar() {
     >
       <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
         <Box fontWeight="bold" fontSize="xl">
-          Ahmed.Dev
+          <Link href="/" _hover={{ textDecoration: "none" }}>
+            Ahmed.Dev
+          </Link>
         </Box>
 
         <HStack spacing={8} alignItems={"center"}>
