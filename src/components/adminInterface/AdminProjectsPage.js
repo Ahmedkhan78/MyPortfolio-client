@@ -15,7 +15,7 @@ const AdminProjectsPage = () => {
 
   useEffect(() => {
     if (user?.role !== "admin") {
-      navigate("/");
+      navigate("/"); // Redirect if not admin
       return;
     }
 
@@ -23,7 +23,7 @@ const AdminProjectsPage = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await api.get("/project", {
-          headers: { Authorization: `Bearer ${token}` }, // ✅ Fixed this line
+          headers: { Authorization: `Bearer ${token}` },
         });
         setProjects(res.data);
       } catch (err) {

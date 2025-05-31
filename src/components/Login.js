@@ -9,7 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { user, login, logout } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {

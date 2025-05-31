@@ -1,3 +1,4 @@
+// src/components/adminInterface/ProjectList.jsx
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
@@ -19,7 +20,7 @@ const ProjectList = ({ projects, setProjects }) => {
 
     try {
       const token = localStorage.getItem("token");
-      await api.delete(`/projects/${id}`, {
+      await api.delete(`/project/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -71,7 +72,7 @@ const ProjectList = ({ projects, setProjects }) => {
                 </a>
                 {user?.role === "admin" && (
                   <>
-                    <Link to={`/projects/edit/${project.id}`}>Edit</Link>
+                    <Link to={`/admin/projects/edit/${project.id}`}>Edit</Link>
                     <button
                       onClick={() => handleDelete(project.id)}
                       className="text-red-600"
