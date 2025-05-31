@@ -68,9 +68,7 @@ function AppContent() {
           />
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
-
           <Route path="/projects/:id" element={<ProjectPost />} />
-
           <Route path="/admin/projects/*" element={<AdminProjectsPage />} />
           <Route path="/login" element={<Login />} />
         </Routes>
