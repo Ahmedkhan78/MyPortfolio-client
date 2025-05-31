@@ -8,31 +8,50 @@ import {
   useColorMode,
   useColorModeValue,
   Link,
+  Button,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
-import { Link as RouterLink } from "react-router-dom"; // 👈 Import Router Link
-
-const Links = ["Home", "Projects", "About", "Contact"];
-
-const NavLink = ({ children }) => (
-  <Link
-    as={RouterLink}
-    to={children === "Home" ? "/" : `/${children.toLowerCase()}`} //  Smart routing
-    px={2}
-    py={1}
-    rounded={"md"}
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-  >
-    {children}
-  </Link>
-);
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext"; // ✅ import AuthContext
 
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
+  const { user, logout } = useContext(AuthContext); // ✅ get user
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+  // ✅ Define Links inside component so user is accessible
+  const Links = ["Home", "Projects", "About", "Contact"];
+  if (user?.role === "admin") {
+    Links.push("Admin");
+  }
+
+  const NavLink = ({ children }) => (
+    <Link
+      as={RouterLink}
+      to={
+        children === "Home"
+          ? "/"
+          : children === "Admin"
+          ? "/admin/projects"
+          : `/${children.toLowerCase()}`
+      }
+      px={2}
+      py={1}
+      rounded={"md"}
+      _hover={{
+        textDecoration: "none",
+        bg: useColorModeValue("gray.200", "gray.700"),
+      }}
+    >
+      {children}
+    </Link>
+  );
 
   return (
     <Box
@@ -44,7 +63,7 @@ export default function Navbar() {
     >
       <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
         <Box fontWeight="bold" fontSize="xl">
-          <Link href="/" _hover={{ textDecoration: "none" }}>
+          <Link as={RouterLink} to="/" _hover={{ textDecoration: "none" }}>
             Ahmed.Dev
           </Link>
         </Box>
@@ -54,6 +73,13 @@ export default function Navbar() {
             {Links.map((link) => (
               <NavLink key={link}>{link}</NavLink>
             ))}
+            {!user ? (
+              <NavLink>Login</NavLink>
+            ) : (
+              <Button size="sm" colorScheme="red" onClick={handleLogout}>
+                Logout
+              </Button>
+            )}
           </HStack>
 
           <IconButton
@@ -80,6 +106,13 @@ export default function Navbar() {
             {Links.map((link) => (
               <NavLink key={link}>{link}</NavLink>
             ))}
+            {!user ? (
+              <NavLink>Login</NavLink>
+            ) : (
+              <Button size="sm" colorScheme="red" onClick={handleLogout}>
+                Logout
+              </Button>
+            )}
           </Stack>
         </Box>
       ) : null}
