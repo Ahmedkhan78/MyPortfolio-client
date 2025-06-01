@@ -1,6 +1,7 @@
 // src/components/Projects.jsx
 import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { FiChevronUp } from "react-icons/fi";
 
 import {
   Box,
@@ -22,6 +23,8 @@ const Projects = () => {
   const cardBg = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.600", "gray.300");
 
+  const [showMore, setShowMore] = useState({});
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -36,7 +39,12 @@ const Projects = () => {
 
   return (
     <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} py={{ base: 10, md: 20 }}>
-      <Heading mb={10} textAlign="center">
+      <Heading
+        mb={10}
+        textAlign="center"
+        color={useColorModeValue("teal.600", "teal.300")}
+        position={"relative"}
+      >
         Projects
       </Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
@@ -57,7 +65,41 @@ const Projects = () => {
             <Box p={5}>
               <Stack spacing={3}>
                 <Heading fontSize="xl">{project.title}</Heading>
-                <Text color={textColor}>{project.description}</Text>
+
+                {/* Truncating text with Read More */}
+                <Text
+                  noOfLines={showMore[project.id] ? undefined : 3}
+                  color={textColor}
+                  cursor={!showMore[project.id] ? "pointer" : "default"}
+                  onClick={() => {
+                    if (!showMore[project.id]) {
+                      setShowMore((prev) => ({
+                        ...prev,
+                        [project.id]: true,
+                      }));
+                    }
+                  }}
+                >
+                  {project.description}
+                </Text>
+
+                {showMore[project.id] && (
+                  <Box
+                    display="flex"
+                    justifyContent="flex-end"
+                    mt={1}
+                    cursor="pointer"
+                    onClick={() =>
+                      setShowMore((prev) => ({
+                        ...prev,
+                        [project.id]: false,
+                      }))
+                    }
+                  >
+                    <FiChevronUp size="20" color="teal" />
+                  </Box>
+                )}
+
                 <Link
                   as={RouterLink}
                   to={`/projects/${project.id}`}
