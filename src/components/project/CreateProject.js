@@ -5,15 +5,19 @@ import api from "../../utils/api"; // Axios instance with baseURL
 const CreateProject = ({ setProjects }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [link, setLink] = useState("");
   const navigate = useNavigate();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => setImage(reader.result);
-    if (file) reader.readAsDataURL(file);
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -26,14 +30,27 @@ const CreateProject = ({ setProjects }) => {
         return;
       }
 
-      const newProject = { title, description, image, link };
-      const response = await api.post("/project", newProject, {
-        headers: { Authorization: `Bearer ${token}` },
+      if (!imageFile) {
+        alert("Please select an image file.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("link", link);
+      formData.append("image", imageFile);
+
+      const response = await api.post("/project", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // 'Content-Type' set automatically by axios when using FormData
+        },
       });
 
       if (response.status === 201) {
         setProjects((prev) => [...prev, response.data]);
-        navigate("/admin/projects", { replace: true }); // ✅ Fixed redirect
+        navigate("/admin/projects", { replace: true });
       } else {
         throw new Error("Failed to create project: " + response.statusText);
       }
@@ -73,8 +90,12 @@ const CreateProject = ({ setProjects }) => {
 
       <input type="file" onChange={handleImageChange} accept="image/*" />
 
-      {image && (
-        <img src={image} alt="preview" className="h-40 object-cover mt-2" />
+      {imagePreview && (
+        <img
+          src={imagePreview}
+          alt="preview"
+          className="h-40 object-cover mt-2"
+        />
       )}
 
       <button

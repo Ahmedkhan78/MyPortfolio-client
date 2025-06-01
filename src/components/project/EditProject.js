@@ -6,41 +6,40 @@ const EditProject = ({ projects, setProjects }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Project ko dhundho id se, id ko number me convert karo
-  const project = projects.find((p) => p.id === Number(id));
+  const project = projects.find((p) => String(p.id) === id);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
   const [link, setLink] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!project) {
-      // Agar project nahi mil raha toh projects load hone tak wait karo
       if (projects.length === 0) {
         setLoading(true);
       } else {
-        // Projects loaded hain par project nahi mila, redirect karo
         navigate("/admin/projects");
       }
       return;
     }
-    // Project mil gaya, form fields set karo
+
     setTitle(project.title || "");
     setDescription(project.description || "");
-    setImage(project.image || "");
     setLink(project.link || "");
+    setImagePreview(project.image || ""); // old image preview
     setLoading(false);
   }, [project, projects, navigate]);
 
-  if (loading) return <div>Loading project details...</div>;
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => setImage(reader.result);
-    if (file) reader.readAsDataURL(file);
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleUpdate = async (e) => {
@@ -48,42 +47,38 @@ const EditProject = ({ projects, setProjects }) => {
 
     try {
       const token = localStorage.getItem("token");
-      const updatedProject = { title, description, image, link };
+      if (!token) {
+        alert("Unauthorized. Please log in again.");
+        return;
+      }
 
-      const response = await api.put(`/project/${id}`, updatedProject, {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("link", link);
+      if (imageFile) {
+        formData.append("image", imageFile); // only append if new image chosen
+      }
+
+      const response = await api.put(`/project/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json", // Add this line explicitly
+          // 'Content-Type' automatically set to multipart/form-data
         },
       });
 
       const updatedList = projects.map((p) =>
-        p.id === Number(id) ? response.data : p
+        String(p.id) === id ? response.data : p
       );
       setProjects(updatedList);
       navigate("/admin/projects");
     } catch (error) {
-      if (error.response) {
-        // Server responded with status code outside 2xx
-        console.error("Error response data:", error.response.data);
-        console.error("Error status:", error.response.status);
-        console.error("Error headers:", error.response.headers);
-        alert(
-          `Update failed: ${
-            error.response.data.message || error.response.status
-          }`
-        );
-      } else if (error.request) {
-        // Request was made but no response received
-        console.error("No response received:", error.request);
-        alert("No response from server. Check your connection.");
-      } else {
-        // Something else happened setting up the request
-        console.error("Axios error:", error.message);
-        alert("Error updating project: " + error.message);
-      }
+      console.error("Error updating project:", error);
+      alert("Failed to update project: " + error.message);
     }
   };
+
+  if (loading) return <div>Loading project details...</div>;
 
   return (
     <form onSubmit={handleUpdate} className="space-y-4 max-w-xl mx-auto p-4">
@@ -114,11 +109,11 @@ const EditProject = ({ projects, setProjects }) => {
         placeholder="Project Link"
       />
 
-      <input type="file" onChange={handleImageChange} accept="image/*" />
+      <input type="file" accept="image/*" onChange={handleImageChange} />
 
-      {image && (
+      {imagePreview && (
         <img
-          src={image}
+          src={imagePreview}
           alt="Project preview"
           className="w-full h-40 object-cover mt-2 rounded"
         />

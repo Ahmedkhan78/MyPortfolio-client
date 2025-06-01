@@ -1,11 +1,32 @@
 // src/components/adminInterface/ProjectList.jsx
-import React, { useContext } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import api from "../../utils/api";
 
 const ProjectList = ({ projects, setProjects }) => {
   const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Memoized fetchProjects using useCallback
+  const fetchProjects = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/project");
+      setProjects(res.data);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [setProjects]);
+
+  // ✅ Proper useEffect with fetchProjects as dependency
+  useEffect(() => {
+    if (!projects || projects.length === 0) {
+      fetchProjects();
+    }
+  }, [projects, fetchProjects]);
 
   const handleDelete = async (id) => {
     if (!user || user.role !== "admin") {
@@ -19,11 +40,7 @@ const ProjectList = ({ projects, setProjects }) => {
     if (!confirmDelete) return;
 
     try {
-      const token = localStorage.getItem("token");
-      await api.delete(`/project/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      await api.delete(`/project/${id}`);
       const updated = projects.filter((p) => p.id !== id);
       setProjects(updated);
     } catch (error) {
@@ -48,44 +65,52 @@ const ProjectList = ({ projects, setProjects }) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {projects.map((project) => (
-          <div
-            key={project.id}
-            className="bg-white border rounded shadow overflow-hidden"
-          >
-            {project.image && (
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-40 object-cover"
-              />
-            )}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold">{project.title}</h3>
-              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                {project.description}
-              </p>
-              <div className="flex justify-between items-center mt-3 text-sm text-blue-600 space-x-2">
-                <a href={project.link} target="_blank" rel="noreferrer">
-                  Visit
-                </a>
-                {user?.role === "admin" && (
-                  <>
-                    <Link to={`/admin/projects/edit/${project.id}`}>Edit</Link>
-                    <button
-                      onClick={() => handleDelete(project.id)}
-                      className="text-red-600"
-                    >
-                      Delete
-                    </button>
-                  </>
-                )}
+      {loading ? (
+        <div className="text-center text-gray-500">Loading projects...</div>
+      ) : projects.length === 0 ? (
+        <div className="text-center text-gray-500">No projects found.</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {projects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-white border rounded shadow overflow-hidden"
+            >
+              {project.image && (
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-full h-40 object-cover"
+                />
+              )}
+              <div className="p-4">
+                <h3 className="text-lg font-semibold">{project.title}</h3>
+                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                  {project.description}
+                </p>
+                <div className="flex justify-between items-center mt-3 text-sm text-blue-600 space-x-2">
+                  <a href={project.link} target="_blank" rel="noreferrer">
+                    Visit
+                  </a>
+                  {user?.role === "admin" && (
+                    <>
+                      <Link to={`/admin/projects/edit/${project.id}`}>
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(project.id)}
+                        className="text-red-600"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
