@@ -3,6 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import api from "../../utils/api";
+import { Heading, useColorModeValue } from "@chakra-ui/react";
 
 const ProjectList = ({ projects, setProjects }) => {
   const { user } = useContext(AuthContext);
@@ -52,9 +53,13 @@ const ProjectList = ({ projects, setProjects }) => {
   return (
     <div>
       <div className="flex justify-center items-center mb-6 gap-20">
-        <h2 className="text-2xl font-bold hover:text-blue-500 cursor-pointer">
+        <Heading
+          as="h2"
+          size="xl"
+          color={useColorModeValue("teal.600", "teal.300")}
+        >
           Projects
-        </h2>
+        </Heading>
         {user?.role === "admin" && (
           <Link
             to="/admin/projects/create"

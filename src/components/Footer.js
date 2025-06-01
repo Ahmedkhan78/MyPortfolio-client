@@ -11,6 +11,9 @@ import {
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 
 const Footer = () => {
+  const githubLink = "https://github.com/Ahmedkhan78";
+  const linkedIn = "https://www.linkedin.com/in/∆hwəd-khan-ʣʞɱ";
+  const mail = "mailto:a499hasan02@gmail.com";
   return (
     <Box
       bg={useColorModeValue("gray.100", "gray.900")}
@@ -26,11 +29,11 @@ const Footer = () => {
         mx="auto"
       >
         <Text mb={{ base: 4, md: 0 }}>
-          © {new Date().getFullYear()} Your Name. All rights reserved.
+          © {new Date().getFullYear()} Ahmed Hasan. All rights reserved.
         </Text>
 
         <Flex gap={4}>
-          <Link href="https://github.com/yourusername" isExternal>
+          <Link href={githubLink} isExternal>
             <IconButton
               aria-label="GitHub"
               icon={<FaGithub />}
@@ -38,7 +41,7 @@ const Footer = () => {
               size="lg"
             />
           </Link>
-          <Link href="https://linkedin.com/in/yourusername" isExternal>
+          <Link href={linkedIn} isExternal>
             <IconButton
               aria-label="LinkedIn"
               icon={<FaLinkedin />}
@@ -46,7 +49,7 @@ const Footer = () => {
               size="lg"
             />
           </Link>
-          <Link href="mailto:youremail@example.com" isExternal>
+          <Link href={mail} isExternal>
             <IconButton
               aria-label="Email"
               icon={<FaEnvelope />}
