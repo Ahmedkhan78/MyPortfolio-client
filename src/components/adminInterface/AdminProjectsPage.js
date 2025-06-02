@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
-import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
-import ProjectList from "../project/ProjectList";
-import CreateProject from "../project/CreateProject";
-import EditProject from "../project/EditProject";
+import api from "../../utils/api";
+
+import ProjectList from "../adminProjectComponents/ProjectList";
+import CreateProject from "../adminProjectComponents/CreateProject";
+import EditProject from "../adminProjectComponents/EditProject";
 import RequireAdmin from "./RequireAdmin";
 
 const AdminProjectsPage = () => {
@@ -15,19 +16,16 @@ const AdminProjectsPage = () => {
 
   useEffect(() => {
     if (user?.role !== "admin") {
-      navigate("/"); // Redirect if not admin
+      navigate("/");
       return;
     }
 
     const fetchProjects = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await api.get("/project", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/project");
         setProjects(res.data);
       } catch (err) {
-        console.error("Admin fetch error", err);
+        console.error("Failed to fetch projects", err);
       }
     };
 
@@ -36,6 +34,9 @@ const AdminProjectsPage = () => {
 
   return (
     <Box p={4}>
+      {/* Dashboard Navigation */}
+
+      {/* Admin Routes */}
       <Routes>
         <Route
           index

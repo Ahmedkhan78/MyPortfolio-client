@@ -17,8 +17,9 @@ import Projects from "./components/Projects";
 import Particle from "./components/Particles";
 import Loader from "./components/Loader";
 import AdminProjectsPage from "./components/adminInterface/AdminProjectsPage";
+import AdminContactPage from "./components/adminInterface/AdminContactPage"; // Import add karo
 import Login from "./components/Login";
-import ProjectPost from "./components/project/ProjectPost";
+import ProjectPost from "./components/adminProjectComponents/ProjectPost";
 
 function AppContent() {
   const location = useLocation();
@@ -69,7 +70,11 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:id" element={<ProjectPost />} />
+
+          {/* Admin routes: Projects and Contact separated */}
           <Route path="/admin/projects/*" element={<AdminProjectsPage />} />
+          <Route path="/admin/contact/*" element={<AdminContactPage />} />
+
           <Route path="/login" element={<Login />} />
         </Routes>
       </Box>
