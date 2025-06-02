@@ -1,27 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../utils/api"; // Axios instance with baseURL
+import api from "../../utils/api"; // Your axios instance
 
 const CreateProject = ({ setProjects }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
   const [link, setLink] = useState("");
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const navigate = useNavigate();
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
-      reader.readAsDataURL(file);
-    }
+    const files = Array.from(e.target.files);
+    setImageFiles(files);
+
+    // Preview logic
+    const previews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews(previews);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!title || !description || !link || imageFiles.length === 0) {
+      alert("Please fill all fields and upload at least one image.");
+      return;
+    }
 
     try {
       const token = localStorage.getItem("token");
@@ -30,21 +34,18 @@ const CreateProject = ({ setProjects }) => {
         return;
       }
 
-      if (!imageFile) {
-        alert("Please select an image file.");
-        return;
-      }
-
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
       formData.append("link", link);
-      formData.append("image", imageFile);
+
+      imageFiles.forEach((file) => {
+        formData.append("images", file); // Same field name as used in backend multer.array("images")
+      });
 
       const response = await api.post("/project", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          // 'Content-Type' set automatically by axios when using FormData
         },
       });
 
@@ -52,7 +53,7 @@ const CreateProject = ({ setProjects }) => {
         setProjects((prev) => [...prev, response.data]);
         navigate("/admin/projects", { replace: true });
       } else {
-        throw new Error("Failed to create project: " + response.statusText);
+        throw new Error("Unexpected response");
       }
     } catch (error) {
       console.error("Failed to create project:", error);
@@ -88,14 +89,25 @@ const CreateProject = ({ setProjects }) => {
         required
       />
 
-      <input type="file" onChange={handleImageChange} accept="image/*" />
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={handleImageChange}
+      />
 
-      {imagePreview && (
-        <img
-          src={imagePreview}
-          alt="preview"
-          className="h-40 object-cover mt-2"
-        />
+      {/* Image previews */}
+      {imagePreviews.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {imagePreviews.map((src, idx) => (
+            <img
+              key={idx}
+              src={src}
+              alt={`Preview ${idx + 1}`}
+              className="h-32 w-auto object-cover border"
+            />
+          ))}
+        </div>
       )}
 
       <button

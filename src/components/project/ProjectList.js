@@ -1,122 +1,211 @@
-// src/components/adminInterface/ProjectList.jsx
+// src/components/admin/ProjectList.jsx
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import api from "../../utils/api";
-import { Heading, useColorModeValue } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Heading,
+  Link,
+  SimpleGrid,
+  Stack,
+  Text,
+  Image,
+  useColorModeValue,
+  Spinner,
+} from "@chakra-ui/react";
+import ReactMarkdown from "react-markdown";
+import { FiChevronUp } from "react-icons/fi";
 
 const ProjectList = ({ projects, setProjects }) => {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+  const [showMore, setShowMore] = useState({});
 
-  // ✅ Memoized fetchProjects using useCallback
+  const isAdmin = user?.role === "admin";
+
+  const cardBg = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.600", "gray.300");
+  const linkColor = useColorModeValue("#3182ce", "#63b3ed");
+
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
       const res = await api.get("/project");
       setProjects(res.data);
-    } catch (error) {
-      console.error("Failed to fetch projects:", error);
+    } catch (err) {
+      console.error("Failed to fetch projects:", err);
     } finally {
       setLoading(false);
     }
   }, [setProjects]);
 
-  // ✅ Proper useEffect with fetchProjects as dependency
   useEffect(() => {
-    if (!projects || projects.length === 0) {
-      fetchProjects();
-    }
+    if (!projects || projects.length === 0) fetchProjects();
   }, [projects, fetchProjects]);
 
   const handleDelete = async (id) => {
-    if (!user || user.role !== "admin") {
-      alert("Unauthorized");
-      return;
-    }
+    if (!isAdmin) return alert("Unauthorized");
 
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this project?"
-    );
-    if (!confirmDelete) return;
+    const confirm = window.confirm("Delete this project?");
+    if (!confirm) return;
 
     try {
       await api.delete(`/project/${id}`);
-      const updated = projects.filter((p) => p.id !== id);
-      setProjects(updated);
-    } catch (error) {
-      console.error("Delete failed:", error);
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error("Delete failed:", err);
       alert("Failed to delete project.");
     }
   };
 
+  const renderActions = (projectId) => (
+    <Stack direction="row" spacing={4}>
+      <Link
+        as={RouterLink}
+        to={`/admin/projects/edit/${projectId}`}
+        color="blue.500"
+        fontWeight="semibold"
+      >
+        Edit
+      </Link>
+      <Button
+        size="sm"
+        colorScheme="red"
+        variant="link"
+        onClick={() => handleDelete(projectId)}
+      >
+        Delete
+      </Button>
+    </Stack>
+  );
+
   return (
-    <div>
-      <div className="flex justify-center items-center mb-6 gap-20">
-        <Heading
-          as="h2"
-          size="xl"
-          color={useColorModeValue("teal.600", "teal.300")}
-        >
+    <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} py={{ base: 10, md: 20 }}>
+      <Stack
+        direction={{ base: "column", md: "row" }}
+        justify="space-between"
+        align="center"
+        mb={10}
+      >
+        <Heading color={useColorModeValue("teal.600", "teal.300")} size="xl">
           Projects
         </Heading>
-        {user?.role === "admin" && (
-          <Link
+        {isAdmin && (
+          <Button
+            as={RouterLink}
             to="/admin/projects/create"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            colorScheme="blue"
+            size="md"
           >
             + Create Project
-          </Link>
+          </Button>
         )}
-      </div>
+      </Stack>
 
       {loading ? (
-        <div className="text-center text-gray-500">Loading projects...</div>
+        <Box textAlign="center" py={10}>
+          <Spinner size="xl" color="gray.500" />
+          <Text mt={2} color="gray.500">
+            Loading projects...
+          </Text>
+        </Box>
       ) : projects.length === 0 ? (
-        <div className="text-center text-gray-500">No projects found.</div>
+        <Text textAlign="center" color="gray.500" py={10}>
+          No projects found.
+        </Text>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
           {projects.map((project) => (
-            <div
+            <Box
               key={project.id}
-              className="bg-white border rounded shadow overflow-hidden"
+              bg={cardBg}
+              boxShadow="md"
+              borderRadius="md"
+              overflow="hidden"
+              position="relative"
             >
               {project.image && (
-                <img
+                <Image
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-40 object-cover"
+                  objectFit="cover"
+                  maxH="200px"
+                  w="100%"
                 />
               )}
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">{project.title}</h3>
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                  {project.description}
-                </p>
-                <div className="flex justify-between items-center mt-3 text-sm text-blue-600 space-x-2">
-                  <a href={project.link} target="_blank" rel="noreferrer">
-                    Visit
-                  </a>
-                  {user?.role === "admin" && (
-                    <>
-                      <Link to={`/admin/projects/edit/${project.id}`}>
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(project.id)}
-                        className="text-red-600"
-                      >
-                        Delete
-                      </button>
-                    </>
+
+              <Box p={5}>
+                <Stack spacing={3}>
+                  <Heading fontSize="xl">{project.title}</Heading>
+
+                  <Box
+                    maxH={showMore[project.id] ? "none" : "4.5em"}
+                    overflow="hidden"
+                    cursor={!showMore[project.id] ? "pointer" : "default"}
+                    color={textColor}
+                    sx={{
+                      "& p": {
+                        margin: 0,
+                        whiteSpace: "pre-wrap",
+                      },
+                      "& a": {
+                        color: linkColor,
+                        textDecoration: "underline",
+                      },
+                    }}
+                    onClick={() => {
+                      if (!showMore[project.id]) {
+                        setShowMore((prev) => ({
+                          ...prev,
+                          [project.id]: true,
+                        }));
+                      }
+                    }}
+                  >
+                    <ReactMarkdown>{project.description}</ReactMarkdown>
+                  </Box>
+
+                  {showMore[project.id] && (
+                    <Box
+                      display="flex"
+                      justifyContent="flex-end"
+                      mt={1}
+                      cursor="pointer"
+                      onClick={() =>
+                        setShowMore((prev) => ({
+                          ...prev,
+                          [project.id]: false,
+                        }))
+                      }
+                      color={linkColor}
+                    >
+                      <FiChevronUp size={20} />
+                    </Box>
                   )}
-                </div>
-              </div>
-            </div>
+
+                  <Stack direction="row" justify="space-between" align="center">
+                    <Link
+                      href={project.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      color="teal.500"
+                      fontWeight="bold"
+                      fontSize="sm"
+                    >
+                      Visit
+                    </Link>
+
+                    {isAdmin && renderActions(project.id)}
+                  </Stack>
+                </Stack>
+              </Box>
+            </Box>
           ))}
-        </div>
+        </SimpleGrid>
       )}
-    </div>
+    </Box>
   );
 };
 

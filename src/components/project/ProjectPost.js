@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import api from "../../utils/api";
 
 const ProjectPost = () => {
@@ -23,24 +24,36 @@ const ProjectPost = () => {
     fetchProject();
   }, [id]);
 
-  if (loading) return <div>Loading...</div>;
-  if (!project) return <div className="text-red-500">Project not found.</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-40 text-gray-500">
+        Loading...
+      </div>
+    );
+  if (!project)
+    return (
+      <div className="text-center text-red-600 mt-10 font-semibold">
+        Project not found.
+      </div>
+    );
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6 text-center">{project.title}</h2>
+    <div className="max-w-3xl mx-auto px-4 py-8">
+      <h2 className="text-4xl font-extrabold mb-8 text-center text-gray-900 dark:text-gray-100">
+        {project.title}
+      </h2>
 
       {project.image && (
         <img
           src={project.image}
           alt={project.title}
-          className="w-full h-64 object-cover rounded mb-6"
+          className="w-full h-64 object-cover rounded-lg shadow-md mb-8"
         />
       )}
 
-      <p className="text-lg leading-relaxed mb-6 text-justify">
-        {project.description}
-      </p>
+      <article className="prose prose-lg max-w-none dark:prose-invert mb-10">
+        <ReactMarkdown>{project.description}</ReactMarkdown>
+      </article>
 
       {project.link && (
         <div className="flex justify-center">
@@ -48,7 +61,7 @@ const ProjectPost = () => {
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded shadow transition"
           >
             Visit Live Project →
           </a>

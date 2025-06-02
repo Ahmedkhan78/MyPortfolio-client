@@ -6,7 +6,6 @@ import { FiChevronUp } from "react-icons/fi";
 import {
   Box,
   Heading,
-  Text,
   Image,
   SimpleGrid,
   Link,
@@ -14,6 +13,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import api from "../utils/api";
 
 const MotionBox = motion(Box);
@@ -22,6 +22,7 @@ const Projects = () => {
   const [projects, setProjects] = useState([]);
   const cardBg = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.600", "gray.300");
+  const linkColor = useColorModeValue("#3182ce", "#63b3ed"); // moved out of callback
 
   const [showMore, setShowMore] = useState({});
 
@@ -61,16 +62,37 @@ const Projects = () => {
             transition={{ delay: index * 0.1 }}
             position={"relative"}
           >
-            <Image src={project.image} alt={project.title} />
+            {project.image && (
+              <Image
+                src={project.image}
+                alt={project.title}
+                objectFit="cover"
+                maxH="200px"
+                w="100%"
+              />
+            )}
             <Box p={5}>
               <Stack spacing={3}>
                 <Heading fontSize="xl">{project.title}</Heading>
 
-                {/* Truncating text with Read More */}
-                <Text
-                  noOfLines={showMore[project.id] ? undefined : 3}
-                  color={textColor}
+                {/* Markdown description with read more/less */}
+                <Box
+                  maxH={
+                    showMore[project.id] ? "none" : "4.5em" /* about 3 lines */
+                  }
+                  overflow="hidden"
                   cursor={!showMore[project.id] ? "pointer" : "default"}
+                  color={textColor}
+                  sx={{
+                    "& p": {
+                      margin: 0,
+                      whiteSpace: "pre-wrap",
+                    },
+                    "& a": {
+                      color: linkColor,
+                      textDecoration: "underline",
+                    },
+                  }}
                   onClick={() => {
                     if (!showMore[project.id]) {
                       setShowMore((prev) => ({
@@ -80,9 +102,10 @@ const Projects = () => {
                     }
                   }}
                 >
-                  {project.description}
-                </Text>
+                  <ReactMarkdown>{project.description}</ReactMarkdown>
+                </Box>
 
+                {/* Show collapse button */}
                 {showMore[project.id] && (
                   <Box
                     display="flex"
@@ -95,8 +118,9 @@ const Projects = () => {
                         [project.id]: false,
                       }))
                     }
+                    color={linkColor}
                   >
-                    <FiChevronUp size="20" color="teal" />
+                    <FiChevronUp size={20} />
                   </Box>
                 )}
 

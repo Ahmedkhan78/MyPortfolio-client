@@ -6,14 +6,17 @@ const EditProject = ({ projects, setProjects }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const project = projects.find((p) => String(p.id) === id);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    link: "",
+  });
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [link, setLink] = useState("");
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const project = projects.find((p) => String(p.id) === id);
 
   useEffect(() => {
     if (!project) {
@@ -25,87 +28,94 @@ const EditProject = ({ projects, setProjects }) => {
       return;
     }
 
-    setTitle(project.title || "");
-    setDescription(project.description || "");
-    setLink(project.link || "");
-    setImagePreview(project.image || ""); // old image preview
+    setFormData({
+      title: project.title || "",
+      description: project.description || "",
+      link: project.link || "",
+    });
+
+    setImagePreview(project.image || "");
     setLoading(false);
   }, [project, projects, navigate]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
+
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleUpdate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Unauthorized. Please log in again.");
+        alert("Unauthorized. Please log in.");
         return;
       }
 
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("link", link);
-      if (imageFile) {
-        formData.append("image", imageFile); // only append if new image chosen
-      }
+      const payload = new FormData();
+      payload.append("title", formData.title);
+      payload.append("description", formData.description);
+      payload.append("link", formData.link);
+      if (imageFile) payload.append("image", imageFile);
 
-      const response = await api.put(`/project/${id}`, formData, {
+      const res = await api.put(`/project/${id}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
-          // 'Content-Type' automatically set to multipart/form-data
         },
       });
 
-      const updatedList = projects.map((p) =>
-        String(p.id) === id ? response.data : p
-      );
-      setProjects(updatedList);
+      const updated = projects.map((p) => (String(p.id) === id ? res.data : p));
+      setProjects(updated);
       navigate("/admin/projects");
-    } catch (error) {
-      console.error("Error updating project:", error);
-      alert("Failed to update project: " + error.message);
+    } catch (err) {
+      console.error("Update failed:", err);
+      alert("Failed to update project.");
     }
   };
 
   if (loading) return <div>Loading project details...</div>;
 
   return (
-    <form onSubmit={handleUpdate} className="space-y-4 max-w-xl mx-auto p-4">
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Edit Project</h2>
 
       <input
         type="text"
+        name="title"
         className="border p-2 w-full"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        value={formData.title}
+        onChange={handleInputChange}
         placeholder="Project Title"
         required
       />
 
       <textarea
+        name="description"
         className="border p-2 w-full"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        value={formData.description}
+        onChange={handleInputChange}
         placeholder="Description"
         required
       />
 
       <input
         type="text"
+        name="link"
         className="border p-2 w-full"
-        value={link}
-        onChange={(e) => setLink(e.target.value)}
+        value={formData.link}
+        onChange={handleInputChange}
         placeholder="Project Link"
       />
 
@@ -114,7 +124,7 @@ const EditProject = ({ projects, setProjects }) => {
       {imagePreview && (
         <img
           src={imagePreview}
-          alt="Project preview"
+          alt="Preview"
           className="w-full h-40 object-cover mt-2 rounded"
         />
       )}
