@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { FiChevronUp } from "react-icons/fi";
 
 import {
   Box,
   Heading,
-  Image,
   SimpleGrid,
   Link,
   Stack,
