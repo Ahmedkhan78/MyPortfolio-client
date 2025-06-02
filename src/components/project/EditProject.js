@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
+import { FiTrash } from "react-icons/fi"; // Importing the trash icon
 
 const EditProject = ({ projects, setProjects }) => {
   const { id } = useParams();
@@ -12,8 +13,8 @@ const EditProject = ({ projects, setProjects }) => {
     link: "",
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const project = projects.find((p) => String(p.id) === id);
@@ -34,7 +35,14 @@ const EditProject = ({ projects, setProjects }) => {
       link: project.link || "",
     });
 
-    setImagePreview(project.image || "");
+    if (Array.isArray(project.images) && project.images.length > 0) {
+      setImageFiles(project.images);
+      setImagePreviews(project.images.map((img) => img.url || img));
+    } else if (project.image) {
+      setImageFiles([project.image]);
+      setImagePreviews([project.image]);
+    }
+
     setLoading(false);
   }, [project, projects, navigate]);
 
@@ -44,14 +52,22 @@ const EditProject = ({ projects, setProjects }) => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
+    const files = Array.from(e.target.files);
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setImageFiles((prevFiles) => [...prevFiles, ...files]);
+    setImagePreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
+  };
 
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
-      reader.readAsDataURL(file);
-    }
+  const handleImageDelete = (index) => {
+    // Remove the image at the specified index from both imageFiles and imagePreviews
+    const updatedFiles = [...imageFiles];
+    const updatedPreviews = [...imagePreviews];
+
+    updatedFiles.splice(index, 1);
+    updatedPreviews.splice(index, 1);
+
+    setImageFiles(updatedFiles);
+    setImagePreviews(updatedPreviews);
   };
 
   const handleSubmit = async (e) => {
@@ -68,7 +84,15 @@ const EditProject = ({ projects, setProjects }) => {
       payload.append("title", formData.title);
       payload.append("description", formData.description);
       payload.append("link", formData.link);
-      if (imageFile) payload.append("image", imageFile);
+
+      // Append all images to form data
+      imageFiles.forEach((file) => {
+        if (file instanceof File) {
+          payload.append("images", file);
+        } else if (typeof file === "string") {
+          payload.append("imageUrls", file); // Existing image URL
+        }
+      });
 
       const res = await api.put(`/project/${id}`, payload, {
         headers: {
@@ -103,7 +127,7 @@ const EditProject = ({ projects, setProjects }) => {
 
       <textarea
         name="description"
-        className="border p-2 w-full"
+        className="border p-2 w-full h-60"
         value={formData.description}
         onChange={handleInputChange}
         placeholder="Description"
@@ -119,15 +143,35 @@ const EditProject = ({ projects, setProjects }) => {
         placeholder="Project Link"
       />
 
-      <input type="file" accept="image/*" onChange={handleImageChange} />
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleImageChange}
+      />
 
-      {imagePreview && (
-        <img
-          src={imagePreview}
-          alt="Preview"
-          className="w-full h-40 object-cover mt-2 rounded"
-        />
-      )}
+      <div className="mt-4">
+        {imagePreviews.length > 0 ? (
+          imagePreviews.map((preview, index) => (
+            <div key={index} className="relative inline-block mr-2">
+              <img
+                src={preview}
+                alt={`Preview ${index + 1}`}
+                className="w-40 h-40 object-cover mt-2 rounded"
+              />
+              <button
+                type="button"
+                onClick={() => handleImageDelete(index)}
+                className="absolute top-0 right-0 p-1 bg-white rounded-full text-red-600 hover:text-red-800"
+              >
+                <FiTrash size={20} />
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>No images available for this project.</p>
+        )}
+      </div>
 
       <button
         type="submit"
