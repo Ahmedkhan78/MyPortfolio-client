@@ -25,6 +25,7 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
+const secretCode = process.env.REACT_APP_SECRET_CODE;
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
@@ -36,8 +37,6 @@ export default function Navbar() {
   // State to control login button visibility for secret code
   const [showLogin, setShowLogin] = useState(false);
 
-  // Secret code you want to detect
-  const secretCode = "xyz123";
   // To keep track of typed keys
   const typedKeysRef = useRef("");
 

@@ -73,7 +73,7 @@ function AppContent() {
 
           {/* Admin routes: Projects and Contact separated */}
           <Route path="/admin/projects/*" element={<AdminProjectsPage />} />
-          <Route path="/admin/contact/*" element={<AdminContactPage />} />
+          <Route path="/admin/contacts/*" element={<AdminContactPage />} />
 
           <Route path="/login" element={<Login />} />
         </Routes>

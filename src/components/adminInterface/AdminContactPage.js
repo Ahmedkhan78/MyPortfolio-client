@@ -17,7 +17,7 @@ const AdminContactPage = () => {
         }
       />
       <Route
-        path=":id"
+        path="/:id"
         element={
           <RequireAdmin>
             <ContactPost />

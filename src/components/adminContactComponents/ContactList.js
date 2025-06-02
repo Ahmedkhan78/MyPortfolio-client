@@ -7,6 +7,9 @@ import {
   Spinner,
   Badge,
   Link,
+  Button,
+  useToast,
+  Flex,
 } from "@chakra-ui/react";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
@@ -16,22 +19,53 @@ const ContactList = () => {
   const { user } = useContext(AuthContext);
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
+
+  // Fetch contacts
+  const fetchContacts = async () => {
+    try {
+      const res = await api.get("/contact");
+      setContacts(res.data);
+    } catch (err) {
+      console.error("Failed to fetch contacts:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete contact
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this contact?"
+    );
+    if (!confirm) return;
+
+    try {
+      await api.delete(`/contact/${id}`);
+      setContacts((prev) => prev.filter((c) => c.id !== id));
+      toast({
+        title: "Deleted",
+        description: "Contact deleted successfully.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (err) {
+      console.error("Delete failed:", err);
+      toast({
+        title: "Error",
+        description: "Failed to delete contact.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
   useEffect(() => {
-    if (!user || user.role !== "admin") return;
-
-    const fetchContacts = async () => {
-      try {
-        const res = await api.get("/contact");
-        setContacts(res.data);
-      } catch (err) {
-        console.error("Failed to fetch contacts:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContacts();
+    if (user?.role === "admin") {
+      fetchContacts();
+    }
   }, [user]);
 
   if (!user || user.role !== "admin") return null;
@@ -60,22 +94,28 @@ const ContactList = () => {
               </Text>
               <Text mt={2}>{contact.message}</Text>
               <Badge mt={2} colorScheme="green">
-                {contact.timestamp && contact.timestamp._seconds
+                {contact.timestamp?._seconds
                   ? new Date(contact.timestamp._seconds * 1000).toLocaleString()
                   : "Date not available"}
               </Badge>
 
-              {/* View Details Link */}
-              <Link
-                as={RouterLink}
-                to={`/admin/projects/contacts/${contact.id}`}
-                color="teal.500"
-                fontWeight="bold"
-                mt={2}
-                display="inline-block"
-              >
-                View Details
-              </Link>
+              <Flex mt={4} gap={4}>
+                <Link
+                  as={RouterLink}
+                  to={`/admin/contacts/${contact.id}`}
+                  color="teal.500"
+                  fontWeight="bold"
+                >
+                  View Details
+                </Link>
+                <Button
+                  size="sm"
+                  colorScheme="red"
+                  onClick={() => handleDelete(contact.id)}
+                >
+                  Delete
+                </Button>
+              </Flex>
             </Box>
           ))}
         </VStack>
