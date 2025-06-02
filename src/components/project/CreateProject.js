@@ -91,9 +91,9 @@ const CreateProject = ({ setProjects }) => {
 
       <input
         type="file"
-        multiple
         accept="image/*"
         onChange={handleImageChange}
+        multiple
       />
 
       {/* Image previews */}
