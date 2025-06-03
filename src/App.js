@@ -28,6 +28,31 @@ function AppContent() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Set loading favicon and title on route change or load
+    document.title = "Loading Ahmed.dev...";
+    changeFavicon("/favicon-loading.ico");
+
+    // Simulate loading done after 1s (like you already do)
+    const timeout = setTimeout(() => {
+      document.title = "Ahmed.dev";
+      changeFavicon("/favicon.ico");
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [location]); // runs on route changes
+
+  // helper function to change favicon
+  function changeFavicon(src) {
+    const link =
+      document.querySelector("link[rel*='icon']") ||
+      document.createElement("link");
+    link.type = "image/x-icon";
+    link.rel = "shortcut icon";
+    link.href = src;
+    document.getElementsByTagName("head")[0].appendChild(link);
+  }
+
+  useEffect(() => {
     const currentPath = location.pathname;
     setShowParticles(currentPath === "/" || currentPath === "/contact");
   }, [location]);
