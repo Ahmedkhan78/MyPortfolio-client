@@ -16,24 +16,25 @@ import api from "../utils/api";
 
 const MotionBox = motion(Box);
 
-const Projects = () => {
+const Projects = ({ limit }) => {
   const [projects, setProjects] = useState([]);
+  const [showMore, setShowMore] = useState({});
+  const [currentImageIndexes, setCurrentImageIndexes] = useState({});
+
   const cardBg = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.600", "gray.300");
   const linkColor = useColorModeValue("#3182ce", "#63b3ed");
 
-  const [showMore, setShowMore] = useState({});
-  // Track current image index for each project by id
-  const [currentImageIndexes, setCurrentImageIndexes] = useState({});
-
+  // Fetch projects from backend
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const res = await api.get("/project");
 
-        // Normalize images for each project
+        // Normalize image data
         const normalized = res.data.map((project) => {
           let imagesArray = [];
+
           if (Array.isArray(project.images) && project.images.length > 0) {
             imagesArray = project.images;
           } else if (
@@ -44,6 +45,7 @@ const Projects = () => {
           } else if (project.images && typeof project.images === "object") {
             imagesArray = [project.images];
           }
+
           return { ...project, images: imagesArray };
         });
 
@@ -52,10 +54,11 @@ const Projects = () => {
         console.error("Failed to fetch projects", err);
       }
     };
+
     fetchProjects();
   }, []);
 
-  // Setup interval to cycle images for projects with multiple images
+  // Rotate project images every few seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndexes((prevIndexes) => {
@@ -67,16 +70,18 @@ const Projects = () => {
             const currentIndex = prevIndexes[project.id] ?? 0;
             newIndexes[project.id] = (currentIndex + 1) % imgs.length;
           } else {
-            newIndexes[project.id] = 0; // Single image, always index 0
+            newIndexes[project.id] = 0;
           }
         });
 
         return newIndexes;
       });
-    }, 4000); // Change image every 4 seconds
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [projects]);
+
+  const visibleProjects = limit ? projects.slice(0, limit) : projects;
 
   return (
     <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} py={{ base: 10, md: 20 }}>
@@ -84,12 +89,12 @@ const Projects = () => {
         mb={10}
         textAlign="center"
         color={useColorModeValue("teal.600", "teal.300")}
-        position={"relative"}
       >
         Projects
       </Heading>
+
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
-        {projects.map((project, index) => {
+        {visibleProjects.map((project, index) => {
           const imgs = project.images || [];
           const currentIndex = currentImageIndexes[project.id] ?? 0;
 
@@ -104,9 +109,9 @@ const Projects = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              position={"relative"}
+              position="relative"
             >
-              {/* Image slider container */}
+              {/* Image Carousel */}
               <Box
                 position="relative"
                 height="200px"
@@ -137,25 +142,18 @@ const Projects = () => {
                 </AnimatePresence>
               </Box>
 
+              {/* Project Info */}
               <Box p={5}>
                 <Stack spacing={3}>
                   <Heading fontSize="xl">{project.title}</Heading>
 
-                  {/* Markdown description with read more/less */}
                   <Box
-                    maxH={
-                      showMore[project.id]
-                        ? "none"
-                        : "4.5em" /* about 3 lines */
-                    }
+                    maxH={showMore[project.id] ? "none" : "4.5em"}
                     overflow="hidden"
                     cursor={!showMore[project.id] ? "pointer" : "default"}
                     color={textColor}
                     sx={{
-                      "& p": {
-                        margin: 0,
-                        whiteSpace: "pre-wrap",
-                      },
+                      "& p": { margin: 0, whiteSpace: "pre-wrap" },
                       "& a": {
                         color: linkColor,
                         textDecoration: "underline",
@@ -173,7 +171,6 @@ const Projects = () => {
                     <ReactMarkdown>{project.description}</ReactMarkdown>
                   </Box>
 
-                  {/* Show collapse button */}
                   {showMore[project.id] && (
                     <Box
                       display="flex"
@@ -206,6 +203,22 @@ const Projects = () => {
           );
         })}
       </SimpleGrid>
+
+      {/* View all link for homepage */}
+      {limit && (
+        <Box textAlign="center" mt={10}>
+          <Link
+            as={RouterLink}
+            to="/projects"
+            fontSize="md"
+            fontWeight="bold"
+            color="teal.500"
+            position={"relative"}
+          >
+            View All Projects →
+          </Link>
+        </Box>
+      )}
     </Box>
   );
 };

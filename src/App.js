@@ -55,7 +55,7 @@ function AppContent() {
               <>
                 <Hero />
                 <About />
-                <Projects />
+                <Projects limit={6} />
               </>
             }
           />
