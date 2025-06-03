@@ -20,6 +20,7 @@ import AdminProjectsPage from "./components/adminInterface/AdminProjectsPage";
 import AdminContactPage from "./components/adminInterface/AdminContactPage"; // Import add karo
 import Login from "./components/Login";
 import ProjectPost from "./components/adminProjectComponents/ProjectPost";
+import HeroContact from "./components/HeroContact";
 
 function AppContent() {
   const location = useLocation();
@@ -62,7 +63,7 @@ function AppContent() {
             path="/contact"
             element={
               <>
-                <Hero />
+                <HeroContact />
                 <Contact />
               </>
             }

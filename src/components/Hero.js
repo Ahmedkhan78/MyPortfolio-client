@@ -16,6 +16,10 @@ const roles = ["FULLSTACK DEVELOPER", "INDIE HACKER", "SOLOPRENEUR"];
 
 const Hero = () => {
   const ellipseRef = useRef(null);
+  const highlightColor = useColorModeValue("teal.700", "teal.300");
+  const typewriterColor = useColorModeValue("teal.500", "#18F2E5");
+  const headingColor = useColorModeValue("gray.800", "white");
+  const sectionBg = useColorModeValue("gray.50", "#011627");
 
   // Rotating ellipse animation
   useEffect(() => {
@@ -33,12 +37,6 @@ const Hero = () => {
     frameId = requestAnimationFrame(rotate);
     return () => cancelAnimationFrame(frameId);
   }, []);
-
-  const headingColor = useColorModeValue("gray.800", "white");
-  const typewriterColor = useColorModeValue("teal.500", "#18F2E5");
-  const subtitleColor = useColorModeValue("gray.600", "gray.300");
-
-  const sectionBg = useColorModeValue("gray.50", "#011627");
 
   const handleResumeClick = async () => {
     try {
@@ -93,8 +91,63 @@ const Hero = () => {
               }}
             />
           </Text>
-          <Text fontSize="lg" color={subtitleColor}>
-            Crafting innovative solutions to solve real-world problems
+          <Text
+            fontSize="lg"
+            color={useColorModeValue("gray.700", "gray.300")}
+            maxW="600px"
+            lineHeight="tall"
+          >
+            I specialize in transforming your{" "}
+            <Box as="span" color={highlightColor}>
+              vision into reality
+            </Box>{" "}
+            by crafting
+            <Box as="span" color={highlightColor}>
+              {" "}
+              robust, scalable, and user-centric applications
+            </Box>
+            . Whether it’s building a{" "}
+            <Box as="span" color={highlightColor}>
+              sleek frontend
+            </Box>
+            , designing
+            <Box as="span" color={highlightColor}>
+              {" "}
+              seamless backend systems
+            </Box>
+            , or delivering{" "}
+            <Box as="span" color={highlightColor}>
+              full-stack solutions
+            </Box>{" "}
+            — I bring{" "}
+            <Box as="span" color={highlightColor}>
+              creativity
+            </Box>
+            ,{" "}
+            <Box as="span" color={highlightColor}>
+              precision
+            </Box>
+            , and{" "}
+            <Box as="span" color={highlightColor}>
+              relentless dedication
+            </Box>{" "}
+            to every project. Let’s work together to create{" "}
+            <Box as="span" color={highlightColor}>
+              innovative products
+            </Box>{" "}
+            that not only solve your toughest challenges but also
+            <Box as="span" color={highlightColor}>
+              drive growth
+            </Box>
+            ,{" "}
+            <Box as="span" color={highlightColor}>
+              engage users
+            </Box>
+            , and{" "}
+            <Box as="span" color={highlightColor}>
+              elevate your brand
+            </Box>{" "}
+            to new heights. Your success is my mission.
           </Text>
           <Flex
             gap={4}

@@ -15,7 +15,7 @@ const Particle = () => {
     console.log(container);
   };
 
-  const particleColor = colorMode === "light" ? "#000000" : "#ffffff";
+  const particleColor = colorMode === "light" ? "#38B2AC" : "#ffffff";
   return (
     <div>
       <Particles

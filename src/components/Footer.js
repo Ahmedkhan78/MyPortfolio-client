@@ -9,11 +9,12 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
+import secrets from "../config/secrets";
 
+const githubLink = secrets.github;
+const linkedIn = secrets.linkedin;
+const mail = `mailto:${secrets.email}`;
 const Footer = () => {
-  const githubLink = "https://github.com/Ahmedkhan78";
-  const linkedIn = "https://www.linkedin.com/in/∆hwəd-khan-ʣʞɱ";
-  const mail = "mailto:a499hasan02@gmail.com";
   return (
     <Box
       bg={useColorModeValue("gray.100", "gray.900")}

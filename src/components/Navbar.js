@@ -24,8 +24,10 @@ import {
 } from "@chakra-ui/icons";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import secrets from "../config/secrets";
 
-const secretCode = process.env.REACT_APP_SECRET_CODE;
+const secretCode = secrets.secretCode;
+
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
