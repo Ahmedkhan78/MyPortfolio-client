@@ -20,6 +20,7 @@ const Footer = () => {
       color={useColorModeValue("gray.600", "gray.300")}
       py={6}
       px={4}
+      position={"relative"}
     >
       <Flex
         direction={{ base: "column", md: "row" }}
