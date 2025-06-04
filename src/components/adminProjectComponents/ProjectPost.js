@@ -10,6 +10,7 @@ import {
   ModalContent,
   ModalCloseButton,
   useDisclosure,
+  Button,
 } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
@@ -27,20 +28,16 @@ const ProjectPost = () => {
         const found = res.data.find((p) => String(p.id) === id);
 
         if (found) {
-          // Normalize images array
           let normalizedImages = [];
 
           if (Array.isArray(found.images)) {
-            // multiple images array
             normalizedImages = found.images;
           } else if (
             typeof found.image === "string" &&
             found.image.trim() !== ""
           ) {
-            // single image string fallback
             normalizedImages = [{ url: found.image }];
           } else if (found.images && typeof found.images === "object") {
-            // maybe a single image object (not array)
             normalizedImages = [found.images];
           }
 
@@ -108,9 +105,9 @@ const ProjectPost = () => {
             className="rounded shadow-lg overflow-hidden cursor-pointer flex-shrink-0"
             style={{
               width: "100%",
-              maxWidth: "700px", // Max width for larger screens
-              height: "auto", // Let height adjust based on the aspect ratio
-              aspectRatio: "16/9", // Optional, you can tweak this based on the aspect ratio of your images
+              maxWidth: "700px",
+              height: "auto",
+              aspectRatio: "16/9",
             }}
             onClick={onOpen}
           >
@@ -143,18 +140,28 @@ const ProjectPost = () => {
 
       {project.link && (
         <div className="flex justify-center">
-          <a
+          <Button
+            as="a"
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded shadow transition"
+            colorScheme="teal"
+            variant="solid"
+            size="md"
+            _hover={{
+              variant: "outline",
+              bg: "transparent",
+              borderColor: "teal.500",
+              color: "teal.500",
+            }}
+            _focus={{ boxShadow: "none" }}
+            className="inline-block font-semibold px-6 py-3 rounded shadow transition-all duration-300 ease-in-out"
           >
             Visit Live Project →
-          </a>
+          </Button>
         </div>
       )}
 
-      {/* Modal for fullscreen image */}
       <Modal isOpen={isOpen} onClose={onClose} size="full" isCentered>
         <ModalOverlay />
         <ModalContent
@@ -188,10 +195,10 @@ const ProjectPost = () => {
             src={images[currentIndex]?.url}
             alt={project.title}
             style={{
-              maxHeight: "90vh", // Keep the image within the height of the viewport
-              maxWidth: "90vw", // Ensure the image doesn't overflow on smaller screens
+              maxHeight: "90vh",
+              maxWidth: "90vw",
               borderRadius: "10px",
-              objectFit: "contain", // Ensure the image fits within the modal without cropping
+              objectFit: "contain",
             }}
             draggable={false}
           />

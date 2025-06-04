@@ -41,14 +41,11 @@ const Hero = () => {
   const handleResumeClick = async () => {
     try {
       const pdfBlob = await fetchResume();
-
-      // Create URL for blob and open in new tab
       const pdfUrl = window.URL.createObjectURL(
         new Blob([pdfBlob], { type: "application/pdf" })
       );
       window.open(pdfUrl, "_blank");
 
-      // Optional: release object URL after some time
       setTimeout(() => window.URL.revokeObjectURL(pdfUrl), 10000);
     } catch (error) {
       alert("Failed to load resume. Please try again later.");
@@ -73,10 +70,10 @@ const Hero = () => {
         maxW="1200px"
         mx="auto"
         w="full"
-        gap={16}
+        gap={{ base: 4, md: 16 }}
         textAlign={{ base: "center", md: "left" }}
       >
-        <Stack spacing={6} flex="1">
+        <Stack spacing={{ base: 4, md: 6 }} flex="1">
           <Heading color={headingColor} fontSize={{ base: "3xl", md: "5xl" }}>
             Hi - I'm Ahmed Hasan
           </Heading>
@@ -150,7 +147,7 @@ const Hero = () => {
             to new heights. Your success is my mission.
           </Text>
           <Flex
-            gap={4}
+            gap={{ base: 2, md: 4 }}
             justify={{ base: "center", md: "flex-start" }}
             flexWrap="wrap"
           >
@@ -171,8 +168,8 @@ const Hero = () => {
 
         <Box
           position="relative"
-          w={{ base: "250px", md: "350px" }}
-          maxW={{ base: "80vw", md: "350px" }}
+          w={{ base: "70vw", md: "350px" }}
+          maxW={{ base: "90vw", md: "350px" }}
           flexShrink={0}
         >
           <Image
