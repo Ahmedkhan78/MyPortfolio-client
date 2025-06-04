@@ -60,7 +60,6 @@ const ProjectPost = () => {
     fetchProject();
   }, [id]);
 
-
   if (loading)
     return (
       <div className="flex justify-center items-center h-40 text-gray-500">
@@ -107,13 +106,18 @@ const ProjectPost = () => {
 
           <div
             className="rounded shadow-lg overflow-hidden cursor-pointer flex-shrink-0"
-            style={{ width: "700px", height: "450px" }}
+            style={{
+              width: "100%",
+              maxWidth: "700px", // Max width for larger screens
+              height: "auto", // Let height adjust based on the aspect ratio
+              aspectRatio: "16/9", // Optional, you can tweak this based on the aspect ratio of your images
+            }}
             onClick={onOpen}
           >
             <img
               src={images[currentIndex]?.url}
               alt={project.title}
-              className="w-full h-full object-cover"
+              className="w-full h-auto object-cover"
               draggable={false}
             />
           </div>
@@ -184,10 +188,10 @@ const ProjectPost = () => {
             src={images[currentIndex]?.url}
             alt={project.title}
             style={{
-              maxHeight: "90vh",
-              maxWidth: "90vw",
+              maxHeight: "90vh", // Keep the image within the height of the viewport
+              maxWidth: "90vw", // Ensure the image doesn't overflow on smaller screens
               borderRadius: "10px",
-              objectFit: "contain",
+              objectFit: "contain", // Ensure the image fits within the modal without cropping
             }}
             draggable={false}
           />
