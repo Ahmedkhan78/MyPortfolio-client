@@ -14,10 +14,10 @@ const CertificatesCTA = ({ variant = "cta" }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/certificate"); // React route pe redirect
+    navigate("/certificate");
   };
 
-  // Navbar link
+  // Navbar link (already fine)
   if (variant === "nav") {
     return (
       <Link
@@ -33,10 +33,13 @@ const CertificatesCTA = ({ variant = "cta" }) => {
     );
   }
 
-  // CTA button
+  // ✅ CTA button (particles ke upar)
   return (
     <MotionBox
       onClick={handleClick}
+      position="relative" // 🔥 IMPORTANT
+      zIndex={5} // 🔥 particles se upar
+      pointerEvents="auto" // 🔥 click enable
       display="flex"
       alignItems="center"
       justifyContent="center"
@@ -58,7 +61,9 @@ const CertificatesCTA = ({ variant = "cta" }) => {
       transition={{ duration: 0.4 }}
     >
       <Text>View Certificates</Text>
-      <Icon as={ExternalLinkIcon} />
+
+      {/* Icon click ko block nahi karega */}
+      <Icon as={ExternalLinkIcon} pointerEvents="none" />
     </MotionBox>
   );
 };
