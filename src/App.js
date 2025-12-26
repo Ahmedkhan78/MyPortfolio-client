@@ -21,6 +21,7 @@ import AdminContactPage from "./components/adminInterface/AdminContactPage"; // 
 import Login from "./components/Login";
 import ProjectPost from "./components/adminProjectComponents/ProjectPost";
 import HeroContact from "./components/HeroContact";
+import CertificatePage from "./components/CertificatePage";
 
 function AppContent() {
   const location = useLocation();
@@ -96,6 +97,7 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:id" element={<ProjectPost />} />
+          <Route path="/certificate" element={<CertificatePage />} />
 
           {/* Admin routes: Projects and Contact separated */}
           <Route path="/admin/projects/*" element={<AdminProjectsPage />} />

@@ -34,6 +34,7 @@ import {
   SiFirebase,
   SiSupabase,
 } from "react-icons/si";
+import CertificatesCTA from "../components/CertificatesCTA";
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -98,6 +99,7 @@ const About = () => {
               I enjoy learning new tech, building projects and contributing to
               open-source.
             </Text>
+            <CertificatesCTA />
           </Stack>
         </Flex>
 

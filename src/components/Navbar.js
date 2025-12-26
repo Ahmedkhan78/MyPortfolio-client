@@ -25,6 +25,7 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import secrets from "../config/secrets";
+import CertificatesCTA from "../components/CertificatesCTA";
 
 const secretCode = secrets.secretCode;
 
@@ -114,6 +115,7 @@ export default function Navbar() {
             <NavLink to="/projects">Projects</NavLink>
             <NavLink to="/about">About</NavLink>
             <NavLink to="/contact">Contact</NavLink>
+            <CertificatesCTA variant="nav" />
 
             {user?.role === "admin" && (
               <Menu>
@@ -182,6 +184,7 @@ export default function Navbar() {
             <NavLink to="/contact" onClick={onClose}>
               Contact
             </NavLink>
+            <CertificatesCTA variant="nav" onClick={onClose} />
 
             {user?.role === "admin" && (
               <Menu>
