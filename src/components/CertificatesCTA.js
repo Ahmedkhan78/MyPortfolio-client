@@ -1,6 +1,6 @@
-import { Box, Text, Icon, Link, useColorModeValue } from "@chakra-ui/react";
+import { Box, Text, Link, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
+
 import { useNavigate } from "react-router-dom";
 
 const MotionBox = motion(Box);
@@ -61,9 +61,6 @@ const CertificatesCTA = ({ variant = "cta" }) => {
       transition={{ duration: 0.4 }}
     >
       <Text>View Certificates</Text>
-
-      {/* Icon click ko block nahi karega */}
-      <Icon as={ExternalLinkIcon} pointerEvents="none" />
     </MotionBox>
   );
 };

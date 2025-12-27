@@ -31,7 +31,7 @@ const Footer = () => {
         mx="auto"
       >
         <Text mb={{ base: 4, md: 0 }}>
-          © {new Date().getFullYear()} Ahmed Hasan. All rights reserved.
+          © {new Date().getFullYear()} Ahmed H. All rights reserved.
         </Text>
 
         <Flex gap={4}>

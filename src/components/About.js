@@ -90,7 +90,9 @@ const About = () => {
           />
 
           <Stack spacing={5} textAlign={{ base: "center", md: "left" }}>
-            <Heading color={headingColor}>About Me</Heading>
+            <Heading color={headingColor} textAlign="center">
+              About Me
+            </Heading>
             <Text color={textColor}>
               I'm a passionate full stack web developer focused on building
               clean, responsive and high-performance web apps.
