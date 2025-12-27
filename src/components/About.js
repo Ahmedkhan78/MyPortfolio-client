@@ -33,7 +33,12 @@ import {
   SiGithub,
   SiFirebase,
   SiSupabase,
+  SiCplusplus,
+  SiC,
+  SiPython,
+  SiNotion,
 } from "react-icons/si";
+import { FaJava, FaSlack, FaTrello, FaDocker, FaLinux } from "react-icons/fa";
 import CertificatesCTA from "../components/CertificatesCTA";
 import image from "../assets/images/profile.jpg";
 
@@ -43,9 +48,15 @@ const MotionModalContent = motion(ModalContent);
 
 /* ================= DATA ================= */
 const techStack = [
+  { label: "C", icon: SiC, percentage: 85 },
+  { label: "C++", icon: SiCplusplus, percentage: 80 },
+  { label: "Python", icon: SiPython, percentage: 90 },
+  { label: "JavaScript", icon: SiJavascript, percentage: 85 },
+  { label: "Java", icon: FaJava, percentage: 75 },
+  { label: "Linux", icon: FaLinux, percentage: 90 },
+  { label: "Docker", icon: FaDocker, percentage: 80 },
   { label: "HTML5", icon: SiHtml5, percentage: 90 },
   { label: "CSS3", icon: SiCss3, percentage: 85 },
-  { label: "JavaScript", icon: SiJavascript, percentage: 80 },
   { label: "MongoDB", icon: SiMongodb, percentage: 75 },
   { label: "Express", icon: SiExpress, percentage: 70 },
   { label: "React", icon: SiReact, percentage: 95 },
@@ -53,6 +64,9 @@ const techStack = [
   { label: "Firebase", icon: SiFirebase, percentage: 80 },
   { label: "Supabase", icon: SiSupabase, percentage: 70 },
   { label: "GitHub", icon: SiGithub, percentage: 90 },
+  { label: "Slack", icon: FaSlack, percentage: 90 },
+  { label: "Trello", icon: FaTrello, percentage: 90 },
+  { label: "Notion", icon: SiNotion, percentage: 95 },
 ];
 
 const About = () => {
@@ -95,23 +109,25 @@ const About = () => {
               About Me
             </Heading>
             <Text color={textColor}>
-              I'm a passionate full stack web developer focused on building
-              clean, responsive and high-performance web apps.
+              I am a Full Stack Developer and Cybersecurity Specialist with a
+              solid foundation in Computer Science. I build high-performance,
+              scalable web applications and have hands-on experience in
+              networking, penetration testing, and IT security. Proficient in C,
+              C++, JavaScript, Python, and modern web frameworks.
             </Text>
             <Text color={subTextColor}>
-              I enjoy learning new tech, building projects and contributing to
-              open-source.
+              I enjoy solving complex problems, learning new technologies, and
+              contributing to impactful projects.
             </Text>
             <CertificatesCTA />
           </Stack>
         </Flex>
 
         {/* ================= TECH STACK ================= */}
-        <Box mt={20} overflow="hidden">
-          <Heading textAlign="center" mb={8} color={headingColor}>
+        <Box mt={20} overflow="hidden" p={8} borderRadius="md">
+          <Heading textAlign="center" mb="8" z-Index={5} color={headingColor}>
             Tech Stack
           </Heading>
-
           {/* ========= HOME → MARQUEE ========= */}
           {isHome && (
             <MotionFlex
@@ -121,7 +137,7 @@ const About = () => {
               animate={{ x: ["0%", "-50%"] }}
               transition={{
                 repeat: Infinity,
-                duration: 25,
+                duration: 30,
                 ease: "linear",
               }}
             >
@@ -135,20 +151,33 @@ const About = () => {
                   <Box position="relative">
                     <CircularProgress
                       value={tech.percentage}
-                      size="90px"
+                      size="110px"
                       thickness="8px"
                       color="teal.500"
                     />
-                    <Icon
-                      as={tech.icon}
-                      boxSize={10}
-                      color={headingColor}
-                      position="absolute"
-                      top="50%"
-                      left="50%"
-                      transform="translate(-50%, -50%)"
-                    />
+                    {tech.icon && (
+                      <Icon
+                        as={tech.icon}
+                        boxSize={10}
+                        color={headingColor}
+                        position="absolute"
+                        top="50%"
+                        left="50%"
+                        transform="translate(-50%, -50%)"
+                      />
+                    )}
+                    {!tech.icon && tech.image && (
+                      <Image
+                        src={tech.image}
+                        boxSize="40px"
+                        position="absolute"
+                        top="50%"
+                        left="50%"
+                        transform="translate(-50%, -50%)"
+                      />
+                    )}
                   </Box>
+
                   <Text mt={2} fontSize="sm" color={subTextColor}>
                     {tech.label}
                   </Text>
