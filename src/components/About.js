@@ -35,6 +35,7 @@ import {
   SiSupabase,
 } from "react-icons/si";
 import CertificatesCTA from "../components/CertificatesCTA";
+import image from "../assets/images/profile.jpg";
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -85,7 +86,7 @@ const About = () => {
           <Image
             borderRadius="full"
             boxSize={{ base: "150px", md: "250px" }}
-            src="https://i.pravatar.cc/300"
+            src={image}
             alt="Profile"
           />
 
