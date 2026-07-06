@@ -1,9 +1,9 @@
 import api from "./api";
 
-export const fetchResume = async () => {
+export const fetchResume = async (file) => {
   try {
-    const response = await api.get("/resume", {
-      responseType: "blob", // important for PDF
+    const response = await api.get(`/resume/${file}`, {
+      responseType: "blob",
     });
     return response.data;
   } catch (error) {

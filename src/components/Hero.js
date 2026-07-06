@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Heading,
@@ -8,13 +8,20 @@ import {
   Flex,
   Image,
   useColorModeValue,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import Typewriter from "typewriter-effect";
 import { fetchResume } from "../utils/fetchResume";
+import { getResumes } from "../utils/getResumes";
 
 const roles = ["FULLSTACK DEVELOPER", "INDIE HACKER", "SOLOPRENEUR"];
 
 const Hero = () => {
+  const [resumes, setResumes] = useState([]);
   const ellipseRef = useRef(null);
   const highlightColor = useColorModeValue("teal.700", "teal.300");
   const typewriterColor = useColorModeValue("teal.500", "#18F2E5");
@@ -38,11 +45,26 @@ const Hero = () => {
     return () => cancelAnimationFrame(frameId);
   }, []);
 
-  const handleResumeClick = async () => {
+  //Resumes
+  useEffect(() => {
+    const loadResumes = async () => {
+      try {
+        const data = await getResumes();
+
+        setResumes(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    loadResumes();
+  }, []);
+
+  const handleResumeClick = async (file) => {
     try {
-      const pdfBlob = await fetchResume();
+      const pdfBlob = await fetchResume(file);
       const pdfUrl = window.URL.createObjectURL(
-        new Blob([pdfBlob], { type: "application/pdf" })
+        new Blob([pdfBlob], { type: "application/pdf" }),
       );
       window.open(pdfUrl, "_blank");
 
@@ -154,15 +176,28 @@ const Hero = () => {
             <Button colorScheme="teal" size="md" as="a" href="/contact">
               Hire Me
             </Button>
-            <Button
-              onClick={handleResumeClick}
-              colorScheme="teal"
-              variant="outline"
-              size="md"
-              aria-label="Download or view resume PDF"
-            >
-              Resume
-            </Button>
+            <Menu>
+              <MenuButton
+                as={Button}
+                colorScheme="teal"
+                variant="outline"
+                size="md"
+                rightIcon={<ChevronDownIcon />}
+              >
+                Resume
+              </MenuButton>
+
+              <MenuList>
+                {resumes.map((resume) => (
+                  <MenuItem
+                    key={resume.file}
+                    onClick={() => handleResumeClick(resume.file)}
+                  >
+                    {resume.title}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
           </Flex>
         </Stack>
 
