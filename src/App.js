@@ -21,7 +21,6 @@ import Loader from "./components/Loader";
 
 import AdminProjectsPage from "./components/adminInterface/AdminProjectsPage";
 import AdminContactPage from "./components/adminInterface/AdminContactPage";
-import AdminCertificatesPage from "./components/adminInterface/AdminCertificatesPage";
 
 import Login from "./components/Login";
 import ProjectPost from "./components/adminProjectComponents/ProjectPost";
@@ -202,15 +201,6 @@ function AppContent() {
             element={
               <AdminGuard>
                 <AdminContactPage />
-              </AdminGuard>
-            }
-          />
-
-          <Route
-            path="/admin/certificate/*"
-            element={
-              <AdminGuard>
-                <AdminCertificatesPage />
               </AdminGuard>
             }
           />
