@@ -38,6 +38,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/AuthContext";
 import secrets from "../config/secrets";
+import api from "../utils/api";
 import CertificatesCTA from "../components/CertificatesCTA";
 
 const secretCode = secrets.secretCode;
@@ -228,45 +229,19 @@ export default function Navbar() {
        *
        * Do NOT import otplib here.
        * Do NOT put ADMIN_TOTP_SECRET in React.
+       *
+       * API request uses the existing Axios instance.
+       * REACT_APP_API_URL is configured in production.
        */
 
-      const response = await fetch(`${secrets.apiBase}/auth/confirm-mfa`, {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        body: JSON.stringify({
-          code: totpCode,
-        }),
+      const response = await api.post("/auth/confirm-mfa", {
+        code: totpCode,
       });
 
-      const raw = await response.text();
+      const data = response.data;
 
-      console.log("MFA status:", response.status);
-      console.log("MFA response:", raw);
-
-      let data = {};
-
-      if (raw) {
-        try {
-          data = JSON.parse(raw);
-        } catch (error) {
-          throw new Error(
-            `Server returned invalid response (${response.status})`,
-          );
-        }
-      }
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || `MFA verification failed (${response.status})`,
-        );
-      }
-
-      if (!data.success) {
-        throw new Error(data.error || "Authenticator verification failed.");
+      if (!data?.success) {
+        throw new Error(data?.error || "Authenticator verification failed.");
       }
 
       // ==================================================
@@ -296,7 +271,11 @@ export default function Navbar() {
     } catch (error) {
       console.error("TOTP verification failed:", error);
 
-      setTotpError(error.message || "Unable to verify authenticator code.");
+      setTotpError(
+        error.response?.data?.error ||
+          error.message ||
+          "Unable to verify authenticator code.",
+      );
     } finally {
       setIsVerifying(false);
     }
