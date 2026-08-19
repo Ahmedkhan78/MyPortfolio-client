@@ -242,10 +242,27 @@ export default function Navbar() {
         }),
       });
 
-      const data = await response.json();
+      const raw = await response.text();
+
+      console.log("MFA status:", response.status);
+      console.log("MFA response:", raw);
+
+      let data = {};
+
+      if (raw) {
+        try {
+          data = JSON.parse(raw);
+        } catch (error) {
+          throw new Error(
+            `Server returned invalid response (${response.status})`,
+          );
+        }
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || "Invalid authenticator code.");
+        throw new Error(
+          data.error || `MFA verification failed (${response.status})`,
+        );
       }
 
       if (!data.success) {
