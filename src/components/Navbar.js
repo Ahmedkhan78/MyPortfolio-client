@@ -404,10 +404,6 @@ export default function Navbar() {
                     <MenuItem onClick={() => navigate("/admin/contacts")}>
                       Contacts
                     </MenuItem>
-
-                    <MenuItem onClick={() => navigate("/admin/certificate")}>
-                      Certificates
-                    </MenuItem>
                   </MenuList>
                 </Menu>
               )}
@@ -522,15 +518,6 @@ export default function Navbar() {
                       }}
                     >
                       Contacts
-                    </MenuItem>
-
-                    <MenuItem
-                      onClick={() => {
-                        navigate("/admin/certificate");
-                        onClose();
-                      }}
-                    >
-                      Certificates
                     </MenuItem>
                   </MenuList>
                 </Menu>
