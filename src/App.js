@@ -1,11 +1,13 @@
-// src/App.jsx
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
+  Navigate,
 } from "react-router-dom";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useContext } from "react";
+
 import { Box, Flex } from "@chakra-ui/react";
 
 import About from "./components/About";
@@ -16,65 +18,141 @@ import Navbar from "./components/Navbar";
 import Projects from "./components/Projects";
 import Particle from "./components/Particles";
 import Loader from "./components/Loader";
+
 import AdminProjectsPage from "./components/adminInterface/AdminProjectsPage";
-import AdminContactPage from "./components/adminInterface/AdminContactPage"; // Import add karo
+import AdminContactPage from "./components/adminInterface/AdminContactPage";
+import AdminCertificatesPage from "./components/adminInterface/AdminCertificatesPage";
+
 import Login from "./components/Login";
 import ProjectPost from "./components/adminProjectComponents/ProjectPost";
 import HeroContact from "./components/HeroContact";
 import CertificatePage from "./components/CertificatePage";
 
+import { AuthContext } from "./context/AuthContext";
+
+// ======================================================
+// LOGIN GUARD
+// ======================================================
+//
+// /login direct access blocked.
+// Login button TOTP verification ke baad hi available hai.
+//
+
+const LoginGuard = ({ children }) => {
+  const token = sessionStorage.getItem("loginUnlockToken");
+
+  const expiresAt = Number(sessionStorage.getItem("loginUnlockExpiresAt"));
+
+  const valid = token && expiresAt && Date.now() < expiresAt;
+
+  if (!valid) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+// ======================================================
+// ADMIN GUARD
+// ======================================================
+//
+// Actual admin pages sirf authenticated admin user
+// ko milengi.
+//
+
+const AdminGuard = ({ children }) => {
+  const { user } = useContext(AuthContext);
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (user.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+// ======================================================
+// APP CONTENT
+// ======================================================
+
 function AppContent() {
   const location = useLocation();
+
   const [showParticles, setShowParticles] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
+  // ====================================================
+  // TITLE + FAVICON
+  // ====================================================
+
   useEffect(() => {
-    // Set loading favicon and title on route change or load
     document.title = "Loading Ahmed.dev...";
+
     changeFavicon("/favicon-loading.ico");
 
-    // Simulate loading done after 1s (like you already do)
     const timeout = setTimeout(() => {
       document.title = "Ahmed.dev";
+
       changeFavicon("/favicon.ico");
     }, 1000);
 
     return () => clearTimeout(timeout);
-  }, [location]); // runs on route changes
+  }, [location]);
 
-  // helper function to change favicon
   function changeFavicon(src) {
     const link =
       document.querySelector("link[rel*='icon']") ||
       document.createElement("link");
+
     link.type = "image/x-icon";
     link.rel = "shortcut icon";
     link.href = src;
+
     document.getElementsByTagName("head")[0].appendChild(link);
   }
 
+  // ====================================================
+  // PARTICLES
+  // ====================================================
+
   useEffect(() => {
     const currentPath = location.pathname;
+
     setShowParticles(currentPath === "/" || currentPath === "/contact");
   }, [location]);
 
+  // ====================================================
+  // LOADER
+  // ====================================================
+
   useEffect(() => {
     setLoading(true);
+
     const timeout = setTimeout(() => {
       setLoading(false);
-    }, 1000); // show loading screen for 1 sec
+    }, 1000);
 
     return () => clearTimeout(timeout);
   }, [location]);
 
-  if (loading) return <Loader />;
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <Flex direction="column" minH="100vh">
       <Navbar />
+
       {showParticles && <Particle />}
 
       <Box flex="1">
         <Routes>
+          {/* ================= HOME ================= */}
+
           <Route
             path="/"
             element={
@@ -85,6 +163,9 @@ function AppContent() {
               </>
             }
           />
+
+          {/* ================= CONTACT ================= */}
+
           <Route
             path="/contact"
             element={
@@ -94,16 +175,60 @@ function AppContent() {
               </>
             }
           />
+
+          {/* ================= PUBLIC ================= */}
+
           <Route path="/about" element={<About />} />
+
           <Route path="/projects" element={<Projects />} />
+
           <Route path="/projects/:id" element={<ProjectPost />} />
+
           <Route path="/certificate" element={<CertificatePage />} />
 
-          {/* Admin routes: Projects and Contact separated */}
-          <Route path="/admin/projects/*" element={<AdminProjectsPage />} />
-          <Route path="/admin/contacts/*" element={<AdminContactPage />} />
+          {/* ================= ADMIN ================= */}
 
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/admin/projects/*"
+            element={
+              <AdminGuard>
+                <AdminProjectsPage />
+              </AdminGuard>
+            }
+          />
+
+          <Route
+            path="/admin/contacts/*"
+            element={
+              <AdminGuard>
+                <AdminContactPage />
+              </AdminGuard>
+            }
+          />
+
+          <Route
+            path="/admin/certificate/*"
+            element={
+              <AdminGuard>
+                <AdminCertificatesPage />
+              </AdminGuard>
+            }
+          />
+
+          {/* ================= LOGIN ================= */}
+
+          <Route
+            path="/login"
+            element={
+              <LoginGuard>
+                <Login />
+              </LoginGuard>
+            }
+          />
+
+          {/* ================= FALLBACK ================= */}
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Box>
 
@@ -111,6 +236,10 @@ function AppContent() {
     </Flex>
   );
 }
+
+// ======================================================
+// APP
+// ======================================================
 
 function App() {
   return (
